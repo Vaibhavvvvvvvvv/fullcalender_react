@@ -1,66 +1,129 @@
 import React, { useState } from "react";
+import { Box, TextField, Button, MenuItem, Typography } from "@mui/material";
+import { v4 as uuidv4 } from "uuid";
 
 const AppointmentForm = ({ events, setEvents, doctors }) => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [doctor, setDoctor] = useState("");
   const [appointmentTime, setAppointmentTime] = useState("");
+  const [errors, setErrors] = useState({});
 
   const handleAppointment = () => {
-    if (email && name && doctor && appointmentTime) {
-      const newEvent = {
-        id: doctor,
-        title: name,
-        start: appointmentTime,
-        end: appointmentTime,
-        resourceId: doctor,
-      };
-      const updatedEvents = [...events, newEvent];
-      setEvents(updatedEvents);
-      localStorage.setItem("events", JSON.stringify(updatedEvents));
+    const newErrors = {};
+    if (!email) newErrors.email = "Email is required";
+    if (!name) newErrors.name = "Name is required";
+    if (!doctor) newErrors.doctor = "Please select a doctor";
+    if (!appointmentTime) newErrors.appointmentTime = "Select date & time";
 
-      setEmail("");
-      setName("");
-      setDoctor("");
-      setAppointmentTime("");
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
     }
+
+    const newEvent = {
+      id: uuidv4(), 
+      title: name,
+      start: appointmentTime,
+      end: appointmentTime,
+      resourceId: doctor,
+    };
+
+    const updatedEvents = [...events, newEvent];
+    setEvents(updatedEvents);
+    localStorage.setItem("events", JSON.stringify(updatedEvents));
+
+    // Reset form
+    setEmail("");
+    setName("");
+    setDoctor("");
+    setAppointmentTime("");
+    setErrors({});
   };
 
   return (
-    <div>
-      <h1>Appointment Form</h1>
-      <input
+    <Box
+      component="form"
+      sx={{
+        maxWidth: 400,
+        mx: "auto",
+        p: 3,
+        boxShadow: 3,
+        borderRadius: 2,
+        bgcolor: "background.paper",
+      }}
+    >
+
+      <Typography variant="h5" fontWeight="bold" color="primary" gutterBottom>
+        Book an Appointment
+      </Typography>
+
+      <TextField
+        fullWidth
+        label="Email"
         type="email"
-        className="form-control"
-        placeholder="Enter Email"
+        variant="outlined"
+        margin="normal"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        error={!!errors.email}
+        helperText={errors.email}
       />
-      <input
+
+      <TextField
+        fullWidth
+        label="Full Name"
         type="text"
-        className="form-control"
-        placeholder="Enter Name"
+        variant="outlined"
+        margin="normal"
         value={name}
         onChange={(e) => setName(e.target.value)}
+        error={!!errors.name}
+        helperText={errors.name}
       />
-      <select className="form-control" value={doctor} onChange={(e) => setDoctor(e.target.value)}>
-        <option value="">Select Doctor</option>
+
+      <TextField
+        select
+        fullWidth
+        label="Select Doctor"
+        variant="outlined"
+        margin="normal"
+        value={doctor}
+        onChange={(e) => setDoctor(e.target.value)}
+        error={!!errors.doctor}
+        helperText={errors.doctor}
+      >
+        <MenuItem value="">Select a doctor</MenuItem>
         {doctors.map((doc) => (
-          <option key={doc.id} value={doc.id}>
+          <MenuItem key={doc.id} value={doc.id}>
             {doc.title}
-          </option>
+          </MenuItem>
         ))}
-      </select>
-      <input
+      </TextField>
+
+      <TextField
+        fullWidth
+        label="Appointment Date & Time"
         type="datetime-local"
-        className="form-control"
+        variant="outlined"
+        margin="normal"
+        InputLabelProps={{ shrink: true }}
         value={appointmentTime}
         onChange={(e) => setAppointmentTime(e.target.value)}
+        error={!!errors.appointmentTime}
+        helperText={errors.appointmentTime}
       />
-      <button className="btn btn-success mt-2" onClick={handleAppointment}>
+
+      <Button
+        fullWidth
+        variant="contained"
+        color="success"
+        sx={{ mt: 2 }}
+        onClick={handleAppointment}
+      >
         Book Appointment
-      </button>
-    </div>
+      </Button>
+    </Box>
   );
 };
 
