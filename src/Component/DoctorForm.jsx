@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { TextField, Button, Box, Typography } from "@mui/material";
 
 const DoctorForm = ({ doctors, setDoctors }) => {
   const [drId, setDrId] = useState("");
@@ -16,26 +17,49 @@ const DoctorForm = ({ doctors, setDoctors }) => {
   };
 
   return (
-    <div>
-      <h1>Doctor Form</h1>
-      <input
-        type="text"
-        className="form-control"
-        placeholder="Enter Dr ID"
+    <Box
+      sx={{
+        maxWidth: 400,
+        margin: "auto",
+        padding: 3,
+        bgcolor: "white",
+        boxShadow: 3,
+        borderRadius: 2,
+        textAlign: "center",
+      }}
+    >
+      <Typography variant="h5" fontWeight="bold" color="primary" gutterBottom>
+        Doctor Form
+      </Typography>
+      
+      <TextField
+        fullWidth
+        label="Enter Dr ID"
+        variant="outlined"
+        margin="normal"
         value={drId}
         onChange={(e) => setDrId(e.target.value)}
       />
-      <input
-        type="text"
-        className="form-control"
-        placeholder="Enter Dr Name"
+      
+      <TextField
+        fullWidth
+        label="Enter Dr Name"
+        variant="outlined"
+        margin="normal"
         value={drName}
         onChange={(e) => setDrName(e.target.value)}
       />
-      <button className="btn btn-success mt-2" onClick={handleSubmit}>
+      
+      <Button
+        variant="contained"
+        color="success"
+        fullWidth
+        sx={{ mt: 2 }}
+        onClick={handleSubmit}
+      >
         Submit
-      </button>
-    </div>
+      </Button>
+    </Box>
   );
 };
 
