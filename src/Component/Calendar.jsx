@@ -5,14 +5,18 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import resourceTimeGridPlugin from "@fullcalendar/resource-timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 
-const Calendar = ({ events, doctors, setEvents, setDoctors }) => {
+const Calendar = ({ events = [], doctors = [], setEvents, setDoctors }) => {
   const [calendarView, setCalendarView] = useState("resourceTimeGridDay");
 
   useEffect(() => {
-    const storedEvents = JSON.parse(localStorage.getItem("events")) || [];
-    const storedDoctors = JSON.parse(localStorage.getItem("doctors")) || [];
-    setEvents(storedEvents);
-    setDoctors(storedDoctors);
+    try {
+      const storedEvents = JSON.parse(localStorage.getItem("events")) || [];
+      const storedDoctors = JSON.parse(localStorage.getItem("doctors")) || [];
+      if (setEvents) setEvents(storedEvents);
+      if (setDoctors) setDoctors(storedDoctors);
+    } catch (error) {
+      console.error("Error parsing localStorage data:", error);
+    }
   }, [setEvents, setDoctors]);
 
   // Function to handle view change
@@ -24,10 +28,10 @@ const Calendar = ({ events, doctors, setEvents, setDoctors }) => {
     <div className="container mt-3">
       {/* View Change Buttons */}
       <div className="mb-3">
-        <button className="btn btn-info mr-2" onClick={() => handleViewChange("dayGridMonth")}>
+        <button className="btn btn-info me-2" onClick={() => handleViewChange("dayGridMonth")}>
           Month View
         </button>
-        <button className="btn btn-info mr-2" onClick={() => handleViewChange("timeGridWeek")}>
+        <button className="btn btn-info me-2" onClick={() => handleViewChange("timeGridWeek")}>
           Week View
         </button>
         <button className="btn btn-info" onClick={() => handleViewChange("resourceTimeGridDay")}>
@@ -35,9 +39,8 @@ const Calendar = ({ events, doctors, setEvents, setDoctors }) => {
         </button>
       </div>
 
-
       <FullCalendar
-        key={calendarView}
+        key={calendarView} // Ensures re-render when view changes
         plugins={[dayGridPlugin, timeGridPlugin, resourceTimeGridPlugin, interactionPlugin]}
         initialView={calendarView}
         resources={doctors}
