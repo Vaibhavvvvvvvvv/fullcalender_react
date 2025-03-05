@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Box, TextField, Button, MenuItem, Typography } from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
 
-const AppointmentForm = ({ events, setEvents, doctors }) => {
+const AppointmentForm = ({ events, setEvents, doctors = [] }) => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [doctor, setDoctor] = useState("");
@@ -22,7 +22,7 @@ const AppointmentForm = ({ events, setEvents, doctors }) => {
     }
 
     const newEvent = {
-      id: uuidv4(), 
+      id: uuidv4(),
       title: name,
       start: appointmentTime,
       end: appointmentTime,
@@ -53,7 +53,6 @@ const AppointmentForm = ({ events, setEvents, doctors }) => {
         bgcolor: "background.paper",
       }}
     >
-
       <Typography variant="h5" fontWeight="bold" color="primary" gutterBottom>
         Book an Appointment
       </Typography>
@@ -125,6 +124,10 @@ const AppointmentForm = ({ events, setEvents, doctors }) => {
       </Button>
     </Box>
   );
+};
+
+AppointmentForm.defaultProps = {
+  doctors: [],
 };
 
 export default AppointmentForm;

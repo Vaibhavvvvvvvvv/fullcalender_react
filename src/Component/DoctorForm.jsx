@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { TextField, Button, Box, Typography } from "@mui/material";
 
-const DoctorForm = ({ doctors, setDoctors }) => {
+const DoctorForm = ({ doctors = [], setDoctors }) => {
   const [drId, setDrId] = useState("");
   const [drName, setDrName] = useState("");
 
@@ -61,6 +61,10 @@ const DoctorForm = ({ doctors, setDoctors }) => {
       </Button>
     </Box>
   );
+};
+
+DoctorForm.defaultProps = {
+  doctors: [],
 };
 
 export default DoctorForm;
