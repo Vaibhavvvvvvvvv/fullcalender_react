@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./Component/Navbar";
 import Calendar from "./Component/Calendar";
@@ -9,6 +9,18 @@ import SignIn from "./Auth&Authantication/SignIn";
 import { AuthProvider, useAuth } from "./AuthContext";
 
 const App = () => {
+  const [doctors, setDoctors] = useState([]);
+  const [events, setEvents] = useState([]);
+
+  // Load doctors from localStorage when the app starts
+  useEffect(() => {
+    const storedDoctors = JSON.parse(localStorage.getItem("doctors")) || [];
+    setDoctors(storedDoctors);
+
+    const storedEvents = JSON.parse(localStorage.getItem("events")) || [];
+    setEvents(storedEvents);
+  }, []);
+
   return (
     <AuthProvider>
       <Router>
@@ -23,7 +35,7 @@ const App = () => {
             path="/"
             element={
               <ProtectedRoute>
-                <Calendar />
+                <Calendar doctors={doctors} events={events} setEvents={setEvents} />
               </ProtectedRoute>
             }
           />
@@ -31,7 +43,7 @@ const App = () => {
             path="/doctors"
             element={
               <ProtectedRoute>
-                <DoctorForm />
+                <DoctorForm doctors={doctors} setDoctors={setDoctors} />
               </ProtectedRoute>
             }
           />
@@ -39,7 +51,7 @@ const App = () => {
             path="/appointments"
             element={
               <ProtectedRoute>
-                <AppointmentForm />
+                <AppointmentForm doctors={doctors} events={events} setEvents={setEvents} />
               </ProtectedRoute>
             }
           />
