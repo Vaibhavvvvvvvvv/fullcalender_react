@@ -1,20 +1,35 @@
 import React, { useState } from "react";
 import { TextField, Button, Box, Typography } from "@mui/material";
+import { db } from "../firebase"; // Import Firestore instance
+import { collection, addDoc } from "firebase/firestore";
 
 const DoctorForm = ({ doctors = [], setDoctors }) => {
   const [drId, setDrId] = useState("");
   const [drName, setDrName] = useState("");
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (drId && drName) {
       const newDoctor = { id: drId, title: drName };
-      const updatedDoctors = [...doctors, newDoctor];
-      setDoctors(updatedDoctors);
-      localStorage.setItem("doctors", JSON.stringify(updatedDoctors));
-      setDrId("");
-      setDrName("");
+
+      try {
+        // Add doctor to Firestore
+        const docRef = await addDoc(collection(db, "doctors"), newDoctor);
+        console.log("Doctor added with ID:", docRef.id);
+
+        // Update local state and storage
+        const updatedDoctors = [...doctors, newDoctor];
+        setDoctors(updatedDoctors);
+        localStorage.setItem("doctors", JSON.stringify(updatedDoctors));
+
+        // Reset form
+        setDrId("");
+        setDrName("");
+      } catch (error) {
+        console.error("Error adding doctor: ", error);
+      }
     }
   };
+
 
   return (
     <Box

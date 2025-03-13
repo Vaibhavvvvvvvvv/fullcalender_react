@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Box, TextField, Button, MenuItem, Typography } from "@mui/material";
-import { v4 as uuidv4 } from "uuid";
-
+import { db } from "../firebase"; // Import Firestore instance
+import { collection, addDoc } from "firebase/firestore";
+import {v4 as uuidv4} from "uuid"
 const AppointmentForm = ({ events, setEvents, doctors = [] }) => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -9,7 +10,7 @@ const AppointmentForm = ({ events, setEvents, doctors = [] }) => {
   const [appointmentTime, setAppointmentTime] = useState("");
   const [errors, setErrors] = useState({});
 
-  const handleAppointment = () => {
+  const handleAppointment = async () => {
     const newErrors = {};
     if (!email) newErrors.email = "Email is required";
     if (!name) newErrors.name = "Name is required";
@@ -20,25 +21,35 @@ const AppointmentForm = ({ events, setEvents, doctors = [] }) => {
       setErrors(newErrors);
       return;
     }
-
+    
     const newEvent = {
       id: uuidv4(),
       title: name,
       start: appointmentTime,
       end: appointmentTime,
       resourceId: doctor,
+      email: email,
     };
+    
+    try {
+      // Add appointment to Firebase Firestore
+      const docRef = await addDoc(collection(db, "appointments"), newEvent);
+      console.log("Appointment added with ID:", docRef.id);
 
-    const updatedEvents = [...events, newEvent];
-    setEvents(updatedEvents);
-    localStorage.setItem("events", JSON.stringify(updatedEvents));
+      // Update local state and storage
+      const updatedEvents = [...events, newEvent];
+      setEvents(updatedEvents);
+      localStorage.setItem("events", JSON.stringify(updatedEvents));
 
-    // Reset form
-    setEmail("");
-    setName("");
-    setDoctor("");
-    setAppointmentTime("");
-    setErrors({});
+      // Reset form
+      setEmail("");
+      setName("");
+      setDoctor("");
+      setAppointmentTime("");
+      setErrors({});
+    } catch (error) {
+      console.error("Error adding appointment: ", error);
+    }
   };
 
   return (

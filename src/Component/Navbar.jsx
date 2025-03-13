@@ -1,10 +1,11 @@
 import React from "react";
 import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate,useLocation } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { currentUser, logout } = useAuth();
 
   const handleLogout = async () => {
@@ -15,6 +16,13 @@ const Navbar = () => {
       console.error("Failed to log out", err);
     }
   };
+  
+  const getButtonStyle = (path) => ({
+    backgroundColor: location.pathname === path ? "transparent" : "inherit",
+    color: location.pathname === path ? "black" : "inherit",
+    fontWeight: location.pathname === path ? "bold" : "normal",
+  });
+
 
   return (
     <AppBar position="static">
@@ -26,13 +34,13 @@ const Navbar = () => {
           {currentUser ? (
             // Show these buttons when the user is authenticated
             <>
-              <Button color="inherit" component={Link} to="/">
+              <Button sx={getButtonStyle("/")} component={Link} to="/">
                 Home
               </Button>
-              <Button color="inherit" component={Link} to="/doctors">
+              <Button sx={getButtonStyle("/doctors")} component={Link} to="/doctors">
                 Doctors
               </Button>
-              <Button color="inherit" component={Link} to="/appointments">
+              <Button sx={getButtonStyle("/appointments")} component={Link} to="/appointments">
                 Appointments
               </Button>
               <Button color="inherit" onClick={handleLogout}>
@@ -42,10 +50,10 @@ const Navbar = () => {
           ) : (
             // Show these buttons when the user is not authenticated
             <>
-              <Button color="inherit" component={Link} to="/login">
+                <Button sx={getButtonStyle("/login")} component={Link} to="/login">
                 Login
               </Button>
-              <Button color="inherit" component={Link} to="/signup">
+              <Button sx={getButtonStyle("/signup")} component={Link} to="/signup">
                 Sign Up
               </Button>
             </>
