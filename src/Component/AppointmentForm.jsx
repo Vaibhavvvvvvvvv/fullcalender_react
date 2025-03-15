@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { Box, TextField, Button, MenuItem, Typography } from "@mui/material";
 import { db } from "../firebase"; // Import Firestore instance
 import { collection, addDoc } from "firebase/firestore";
-import {v4 as uuidv4} from "uuid"
+import { v4 as uuidv4 } from "uuid"
+import swal from 'sweetalert'
 const AppointmentForm = ({ events, setEvents, doctors = [] }) => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -21,7 +22,7 @@ const AppointmentForm = ({ events, setEvents, doctors = [] }) => {
       setErrors(newErrors);
       return;
     }
-    
+
     const newEvent = {
       id: uuidv4(),
       title: name,
@@ -30,7 +31,7 @@ const AppointmentForm = ({ events, setEvents, doctors = [] }) => {
       resourceId: doctor,
       email: email,
     };
-    
+
     try {
       // Add appointment to Firebase Firestore
       const docRef = await addDoc(collection(db, "appointments"), newEvent);
@@ -47,8 +48,19 @@ const AppointmentForm = ({ events, setEvents, doctors = [] }) => {
       setDoctor("");
       setAppointmentTime("");
       setErrors({});
+      swal({
+        title: "Appointment Booked!",
+        text: "Your appointment has been booked successfully.",
+        icon: "success",
+      });
     } catch (error) {
       console.error("Error adding appointment: ", error);
+      swal({
+        title: "Error!",
+        text: "Something went wrong. Please try again later.",
+        icon: "error",
+        button: "OK",
+      });
     }
   };
 

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { TextField, Button, Box, Typography } from "@mui/material";
-import { db } from "../firebase"; // Import Firestore instance
+import { db } from "../firebase";
 import { collection, addDoc } from "firebase/firestore";
-
+import swal from 'sweetalert'
 const DoctorForm = ({ doctors = [], setDoctors }) => {
   const [drId, setDrId] = useState("");
   const [drName, setDrName] = useState("");
@@ -24,8 +24,10 @@ const DoctorForm = ({ doctors = [], setDoctors }) => {
         // Reset form
         setDrId("");
         setDrName("");
+        swal("Doctor Added!", "Doctor has been added successfully.", "success");
       } catch (error) {
         console.error("Error adding doctor: ", error);
+        swal("Doctor Added!", "Doctor has been added successfully.", "success");
       }
     }
   };
@@ -46,7 +48,7 @@ const DoctorForm = ({ doctors = [], setDoctors }) => {
       <Typography variant="h5" fontWeight="bold" color="primary" gutterBottom>
         Doctor Form
       </Typography>
-      
+
       <TextField
         fullWidth
         label="Enter Dr ID"
@@ -55,7 +57,7 @@ const DoctorForm = ({ doctors = [], setDoctors }) => {
         value={drId}
         onChange={(e) => setDrId(e.target.value)}
       />
-      
+
       <TextField
         fullWidth
         label="Enter Dr Name"
@@ -64,7 +66,7 @@ const DoctorForm = ({ doctors = [], setDoctors }) => {
         value={drName}
         onChange={(e) => setDrName(e.target.value)}
       />
-      
+
       <Button
         variant="contained"
         color="success"
