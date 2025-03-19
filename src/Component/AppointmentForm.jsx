@@ -32,6 +32,10 @@ const AppointmentForm = ({ events, setEvents, doctors = [] }) => {
       email: email,
     };
 
+    if (!doctors || doctors.length === 0) {
+      return <Typography>No doctors available. Please add doctors first.</Typography>;
+    }
+    
     try {
       // Add appointment to Firebase Firestore
       const docRef = await addDoc(collection(db, "appointments"), newEvent);
@@ -104,7 +108,7 @@ const AppointmentForm = ({ events, setEvents, doctors = [] }) => {
         helperText={errors.name}
       />
 
-      <TextField
+      {/* <TextField
         select
         fullWidth
         label="Select Doctor"
@@ -121,7 +125,26 @@ const AppointmentForm = ({ events, setEvents, doctors = [] }) => {
             {doc.title}
           </MenuItem>
         ))}
+      </TextField> */}
+      <TextField
+        select
+        fullWidth
+        label="Select Doctor"
+        variant="outlined"
+        margin="normal"
+        value={doctor}
+        onChange={(e) => setDoctor(e.target.value)}
+        error={!!errors.doctor}
+        helperText={errors.doctor}
+      >
+        <MenuItem value="">Select a doctor</MenuItem>
+        {Array.from(new Map(doctors.map(doc => [doc.id, doc])).values()).map((doc) => (
+          <MenuItem key={doc.id} value={doc.id}>
+            {doc.title}
+          </MenuItem>
+        ))}
       </TextField>
+
 
       <TextField
         fullWidth
