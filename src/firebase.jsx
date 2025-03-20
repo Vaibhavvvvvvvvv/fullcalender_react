@@ -8,7 +8,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyA_GnwgfG5h8ht1aP5ZaJnEhH2Bc9mO5cE",
   authDomain: "fullcalendar-e4d75.firebaseapp.com",
   projectId: "fullcalendar-e4d75",
-  storageBucket: "fullcalendar-e4d75.firebasestorage.app",
+  storageBucket: "fullcalendar-e4d75.appspot.com",
   messagingSenderId: "489122876112",
   appId: "1:489122876112:web:40dc7990a0764001106cd5",
   measurementId: "G-5KP7VNSC72",
