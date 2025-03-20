@@ -2,36 +2,38 @@ import React, { useState } from "react";
 import { TextField, Button, Box, Typography } from "@mui/material";
 import { db } from "../firebase";
 import { collection, addDoc } from "firebase/firestore";
-import swal from 'sweetalert'
+import swal from "sweetalert";
+
 const DoctorForm = ({ doctors = [], setDoctors }) => {
   const [drId, setDrId] = useState("");
   const [drName, setDrName] = useState("");
 
   const handleSubmit = async () => {
-    if (drId && drName) {
-      const newDoctor = { id: drId, title: drName };
+    if (!drId || !drName) {
+      swal("Error", "Please enter both Doctor ID and Name", "error");
+      return;
+    }
 
-      try {
-        // Add doctor to Firestore
-        const docRef = await addDoc(collection(db, "doctors"), newDoctor);
-        console.log("Doctor added with ID:", docRef.id);
+    const newDoctor = { id: drId, title: drName };
 
-        // Update local state and storage
-        const updatedDoctors = [...doctors, newDoctor];
-        setDoctors(updatedDoctors);
-        localStorage.setItem("doctors", JSON.stringify(updatedDoctors));
+    try {
+      // Add doctor to Firebase Firestore
+      const docRef = await addDoc(collection(db, "doctors"), newDoctor);
+      console.log("Doctor added with ID:", docRef.id);
 
-        // Reset form
-        setDrId("");
-        setDrName("");
-        swal("Doctor Added!", "Doctor has been added successfully.", "success");
-      } catch (error) {
-        console.error("Error adding doctor: ", error);
-        swal("Doctor Added!", "Doctor has been added successfully.", "success");
-      }
+      // Update local state without using localStorage
+      setDoctors([...doctors, newDoctor]);
+
+      // Reset form
+      setDrId("");
+      setDrName("");
+
+      swal("Doctor Added!", "Doctor has been added successfully.", "success");
+    } catch (error) {
+      console.error("Error adding doctor:", error);
+      swal("Error", "Something went wrong. Please try again later.", "error");
     }
   };
-
 
   return (
     <Box

@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Box, TextField, Button, MenuItem, Typography } from "@mui/material";
-import { db } from "../firebase"; // Import Firestore instance
+import { db } from "../firebase"; // Firestore instance
 import { collection, addDoc } from "firebase/firestore";
-import { v4 as uuidv4 } from "uuid"
-import swal from 'sweetalert'
+import { v4 as uuidv4 } from "uuid";
+import swal from "sweetalert";
+
 const AppointmentForm = ({ events, setEvents, doctors = [] }) => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -32,19 +33,13 @@ const AppointmentForm = ({ events, setEvents, doctors = [] }) => {
       email: email,
     };
 
-    if (!doctors || doctors.length === 0) {
-      return <Typography>No doctors available. Please add doctors first.</Typography>;
-    }
-    
     try {
-      // Add appointment to Firebase Firestore
+      // Store appointment in Firebase Firestore
       const docRef = await addDoc(collection(db, "appointments"), newEvent);
       console.log("Appointment added with ID:", docRef.id);
 
-      // Update local state and storage
-      const updatedEvents = [...events, newEvent];
-      setEvents(updatedEvents);
-      localStorage.setItem("events", JSON.stringify(updatedEvents));
+      // Update local state without using localStorage
+      setEvents([...events, newEvent]);
 
       // Reset form
       setEmail("");
@@ -52,21 +47,23 @@ const AppointmentForm = ({ events, setEvents, doctors = [] }) => {
       setDoctor("");
       setAppointmentTime("");
       setErrors({});
+      
       swal({
         title: "Appointment Booked!",
         text: "Your appointment has been booked successfully.",
         icon: "success",
       });
     } catch (error) {
-      console.error("Error adding appointment: ", error);
+      console.error("Error adding appointment:", error);
       swal({
         title: "Error!",
         text: "Something went wrong. Please try again later.",
         icon: "error",
-        button: "OK",
       });
     }
   };
+
+  const uniqueDoctors = Array.from(new Map(doctors.map(doc => [doc.id, doc])).values());
 
   return (
     <Box
@@ -107,25 +104,7 @@ const AppointmentForm = ({ events, setEvents, doctors = [] }) => {
         error={!!errors.name}
         helperText={errors.name}
       />
-
-      {/* <TextField
-        select
-        fullWidth
-        label="Select Doctor"
-        variant="outlined"
-        margin="normal"
-        value={doctor}
-        onChange={(e) => setDoctor(e.target.value)}
-        error={!!errors.doctor}
-        helperText={errors.doctor}
-      >
-        <MenuItem value="">Select a doctor</MenuItem>
-        {doctors.map((doc) => (
-          <MenuItem key={doc.id} value={doc.id}>
-            {doc.title}
-          </MenuItem>
-        ))}
-      </TextField> */}
+      
       <TextField
         select
         fullWidth
@@ -138,13 +117,12 @@ const AppointmentForm = ({ events, setEvents, doctors = [] }) => {
         helperText={errors.doctor}
       >
         <MenuItem value="">Select a doctor</MenuItem>
-        {Array.from(new Map(doctors.map(doc => [doc.id, doc])).values()).map((doc) => (
+        {uniqueDoctors.map((doc) => (
           <MenuItem key={doc.id} value={doc.id}>
             {doc.title}
           </MenuItem>
         ))}
       </TextField>
-
 
       <TextField
         fullWidth

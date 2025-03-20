@@ -7,20 +7,62 @@ import AppointmentForm from "./Component/AppointmentForm";
 import Login from "./Auth&Authantication/Login";
 import SignIn from "./Auth&Authantication/SignIn";
 import { AuthProvider, useAuth } from "./AuthContext";
+import { db } from "./firebase";
+import { collection, getDocs } from "firebase/firestore";
 
 const App = () => {
   const [doctors, setDoctors] = useState([]);
   const [events, setEvents] = useState([]);
 
-  // Load doctors from localStorage when the app starts
+  // Fetch doctors from Firebase
   useEffect(() => {
-    const storedDoctors = JSON.parse(localStorage.getItem("doctors")) || [];
-    setDoctors(storedDoctors);
+    const fetchDoctors = async () => {
+      try {
+        const doctorsCollection = collection(db, "doctors");
+        const doctorsSnapshot = await getDocs(doctorsCollection);
+        const doctorList = doctorsSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          title: doc.data().title || "Unknown Doctor",
+        }));
 
-    const storedEvents = JSON.parse(localStorage.getItem("events")) || [];
-    setEvents(storedEvents);
+        setDoctors(doctorList);
+      } catch (error) {
+        console.error("Error fetching doctors:", error);
+      }
+    };
+
+    fetchDoctors();
   }, []);
 
+  // Fetch appointments (events) from Firebase
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const eventsCollection = collection(db, "appointments");
+        const eventsSnapshot = await getDocs(eventsCollection);
+        const eventList = eventsSnapshot.docs.map((doc) => {
+          const eventData = doc.data();
+          
+          return {
+            id: doc.id,
+            title: eventData.title || "No Title",
+            start: new Date(eventData.start).toISOString(), // ✅ Ensure ISO format
+            end: new Date(eventData.end).toISOString(),     // ✅ Ensure ISO format
+            resourceId: eventData.resourceId || "",
+          };
+        });
+  
+        console.log("✅ Final Formatted Events for Calendar:", eventList);
+        setEvents(eventList);
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      }
+    };
+  
+    fetchEvents();
+  }, []);
+  
+    
   return (
     <AuthProvider>
       <Router>
@@ -35,7 +77,7 @@ const App = () => {
             path="/"
             element={
               <ProtectedRoute>
-                <Calendar doctors={doctors} events={events} setEvents={setEvents} />
+                <Calendar doctors={doctors} events={events} setEvents={setEvents} setDoctors={setDoctors} />
               </ProtectedRoute>
             }
           />
@@ -55,7 +97,6 @@ const App = () => {
               </ProtectedRoute>
             }
           />
-
 
           {/* Redirect unknown routes to login */}
           <Route path="*" element={<Navigate to="/login" />} />
